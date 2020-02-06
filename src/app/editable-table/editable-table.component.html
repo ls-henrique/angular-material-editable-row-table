@@ -1,0 +1,57 @@
+<form [formGroup]="form">
+	<mat-toolbar color="primary">
+		<span>Angular Material</span>
+		<button class="edit" mat-icon-button aria-label="Editar" (click)="onEditChange()">
+      <mat-icon *ngIf="editMode">lock</mat-icon>
+      <mat-icon *ngIf="!editMode">mode_edit</mat-icon>
+    </button>
+	</mat-toolbar>
+
+	<div class="example-container mat-elevation-z8">
+		<mat-table #table [dataSource]="dataSource" matSort #sort="matSort" formArrayName="element">
+			<!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+
+			<!-- Position Column -->
+			<ng-container matColumnDef="position">
+				<mat-header-cell *matHeaderCellDef mat-sort-header> No. </mat-header-cell>
+				<mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
+
+					<span *ngIf="!editMode"> {{ this.form.get('element').at([index]).get('position').value }} </span>
+					<input matInput [placeholder]="element.position" formControlName="position" *ngIf="editMode" required>
+
+				</mat-cell>
+			</ng-container>
+
+			<!-- Name Column -->
+			<ng-container matColumnDef="name">
+				<mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+				<mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
+
+					<span *ngIf="!editMode"> {{ this.form.get('element').at([index]).get('name').value }} </span>
+					<input matInput [placeholder]="element.name" formControlName="name" *ngIf="editMode" required>
+
+        </mat-cell>
+			</ng-container>
+
+			<!-- Weight Column -->
+			<ng-container matColumnDef="weight">
+				<mat-header-cell *matHeaderCellDef mat-sort-header> Weight </mat-header-cell>
+				<mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
+
+					<span *ngIf="!editMode"> {{ this.form.get('element').at([index]).get('weight').value }} </span>
+					<input matInput [placeholder]="element.weight" formControlName="weight" *ngIf="editMode" required>
+
+        </mat-cell>
+			</ng-container>
+
+			<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+			<mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row"></mat-row>
+		</mat-table>
+		<mat-paginator class="paginator" #MatPaginator pageSize="5"></mat-paginator>
+	</div>
+</form>
+
+<!-- Copyright 2017 Google Inc. All Rights Reserved.
+    Use of this source code is governed by an MIT-style license that
+    can be found in the LICENSE file at http://angular.io/license -->

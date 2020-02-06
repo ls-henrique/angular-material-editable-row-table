@@ -1,30 +1,88 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from "@angular/core";
 import { MatTableDataSource, MatPaginator, MatSort } from "@angular/material";
+import {
+  FormGroup,
+  FormControl,
+  FormBuilder,
+  FormArray,
+  Validators
+} from "@angular/forms";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: "app-editable-table",
   templateUrl: "./editable-table.component.html",
-  styleUrls: ["./editable-table.component.css"]
+  styleUrls: ["./editable-table.component.scss"]
 })
 export class EditableTableComponent implements OnInit, AfterViewInit {
-  
-  displayedColumns = ["position", "name", "weight", "action"];
+  form: FormGroup;
+  editMode: Boolean;
+
+  displayedColumns = ["position", "name", "weight"];
   dataSource: MatTableDataSource<Element>;
 
   @ViewChild("MatPaginator", { static: false }) paginator: MatPaginator;
   @ViewChild("sort", { static: false }) sort: MatSort;
 
-  constructor() {
+  constructor(private _formBuilder: FormBuilder, public snackBar: MatSnackBar) {
     this.dataSource = new MatTableDataSource();
   }
 
   ngOnInit() {
+    this.form = this._formBuilder.group({
+      element: this._formBuilder.array([])
+    });
+
+    this.editMode = false;
+
+    let formArray = new FormArray(data.map(o => this.asFormGroup(o)));
+    formArray.controls.forEach(o => {
+      (this.form.controls["element"] as FormArray).push(o);
+    });
+
     this.dataSource.data = data;
   }
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+  }
+
+  onEditChange() {
+    if (this.editMode && this.form.get("element").invalid) {
+      (this.form.get("element") as FormArray).controls.forEach(o =>
+        o.invalid
+          ? this.snackBar.open( this.getFormValidationErrors((o as FormGroup))[0],"Error!", {
+                duration: 2000
+              }
+            )
+          : null
+      );
+
+      return;
+    }
+
+    this.editMode = !this.editMode;
+  }
+
+  getFormValidationErrors(form: FormGroup) {
+    let errors = [];
+        Object.keys(form.controls).map(controlName => {
+            let control = form.get(controlName) as FormControl;
+            if (control.errors !== null) {
+                errors.push(Object.keys(control.errors || {}).map(key => controlName.concat(' ', key, "!") ));
+            }
+        })
+        return errors;
+  }
+
+  private asFormGroup(element: Element): FormGroup {
+    return new FormGroup({
+      position: new FormControl(element.position, Validators.required),
+      name: new FormControl(element.name, Validators.required),
+      weight: new FormControl(element.weight, Validators.required),
+      symbol: new FormControl(element.symbol, Validators.required)
+    });
   }
 }
 
