@@ -1,3 +1,3 @@
-# angular-igdosp
+# angular-editable-row-table
 
-[Edit on StackBlitz ⚡️](https://stackblitz.com/edit/angular-igdosp)
+[Edit on StackBlitz ⚡️](https://stackblitz.com/edit/editable-row-table)
